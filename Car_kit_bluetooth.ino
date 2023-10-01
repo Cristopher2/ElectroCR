@@ -1,3 +1,4 @@
+//Código creado por Electro CR, instagram electro__cr, correo: cristopher533@gmail.com
 char t;
 const int LR = 8;
 const int LF = 5;
