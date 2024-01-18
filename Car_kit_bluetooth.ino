@@ -32,7 +32,7 @@ void loop() {
       Serial.println("1");
     }
 
-    else if (t == 'B') {    //move reverse (all  motors rotate in reverse direction)
+    else if (t == 'G') {    //move reverse (all  motors rotate in reverse direction)
       digitalWrite(LR, HIGH);
       digitalWrite(RR, HIGH);
       Serial.println("2");
