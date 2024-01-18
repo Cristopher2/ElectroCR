@@ -10,10 +10,26 @@ int joyY1;  // Variable to store the Y-axis value from Joystick 1
 int joyX2;  // Variable to store the X-axis value from Joystick 2
 int joyY2;  // Variable to store the Y-axis value from Joystick 2
 
+
+//THIS PART SHOULD BE CALIBRATAD PER THE SERVO MOTOR MOVEMENT RANGE:
+
+//STARTING POSITION OF THE SERVOS:
 int servoX1Position=45;  // Variable to store the servo X1 position
 int servoY1Position=135;  // Variable to store the servo Y1 position
 int servoX2Position=95;  // Variable to store the servo X2 position
 int servoY2Position=135;  // Variable to store the servo Y2 position
+
+//LIMITS FOR THE RANGE OF THE MOVEMENT
+int servoX1Max=90;  // Variable to store the servo X1 position
+int servoY1Max=150;  // Variable to store the servo Y1 position
+int servoX2Max=180;  // Variable to store the servo X2 position
+int servoY2Max=180;  // Variable to store the servo Y2 position
+
+int servoX1Min=30;  // Variable to store the servo X1 position
+int servoY1Min=120;  // Variable to store the servo Y1 position
+int servoX2Min=10;  // Variable to store the servo X2 position
+int servoY2Min=190;  // Variable to store the servo Y2 position
+
 
 void setup() {
   Serial.begin(9600);  // Initialize serial communication at 9600 bps
@@ -33,15 +49,15 @@ void loop() {
   joyX2 = analogRead(A2);
   joyY2 = analogRead(A1);
 
-  if(joyX1<90&&servoX1Position>30){servoX1Position--;}
-  if(joyX2<100&&servoX2Position>10){servoX2Position--;}
-  if(joyY1<100&&servoY1Position>120){servoY1Position--;}
-  if(joyY2<100&&servoY2Position>90){servoY2Position--;}
+  if(joyX1<100&&servoX1Position>servoX1Min){servoX1Position--;}
+  if(joyX2<100&&servoX2Position>servoX2Min){servoX2Position--;}
+  if(joyY1<100&&servoY1Position>servoY1Min){servoY1Position--;}
+  if(joyY2<100&&servoY2Position>servoY2Min){servoY2Position--;}
 
-  if(joyX1>900&&servoX1Position<90){servoX1Position++;}
-  if(joyY1>900&&servoY1Position<150){servoY1Position++;}
-  if(joyX2>900&&servoX2Position<180){servoX2Position++;}
-  if(joyY2>900&&servoY2Position<180){servoY2Position++;}
+  if(joyX1>900&&servoX1Position<servoX1Max){servoX1Position++;}
+  if(joyY1>900&&servoY1Position<servoY1Max){servoY1Position++;}
+  if(joyX2>900&&servoX2Position<servoX2Max){servoX2Position++;}
+  if(joyY2>900&&servoY2Position<servoY2Max){servoY2Position++;}
 
   // Move the servos to the calculated positions
   servoX1.write(servoX1Position);
