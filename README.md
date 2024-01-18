@@ -12,4 +12,4 @@
 
 1. 📥 **Clona el Repositorio:**
    ```bash
-   git clone https://github.com/tu-usuario/electro-cr-ejemplos.git
+   git clone https://github.com/Cristopher2/ElectroCR.git
