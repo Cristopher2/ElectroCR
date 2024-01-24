@@ -1,9 +1,9 @@
 //Código creado por Electro CR, instagram electro__cr, correo: cristopher533@gmail.com
 char t;
-const int LR = 8;
-const int LF = 5;
-const int RF = 6;
-const int RR = 7;
+const int LR = 7; //IN3
+const int LF = 6; ////IN4
+const int RF = 5; //IN1
+const int RR = 4; //IN2
 
 void setup() {
   pinMode(LF, OUTPUT);  //left motors  forward
