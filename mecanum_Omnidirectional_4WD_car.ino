@@ -5,6 +5,11 @@
   Author: Ajay Huajian
   2023 Copyright(c) ZHIYI Technology Inc. All right reserved
 */
+//Set the following parameter to true if you want avoiding obstacles mode
+//Cambie el siguiente parametro por true si quieres que esquive obstaculos al moverte hacia adelante
+bool AVOID_OBST=false;
+
+
 //Configure THE PWM control pin
 const int PWM2A = 11;      //M1 motor
 const int PWM2B = 3;       //M2 motor
@@ -52,6 +57,7 @@ void setup()
     pinMode(PWM0A,OUTPUT);
     pinMode(PWM2A,OUTPUT);
     pinMode(PWM2B,OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
 
     pinMode(Trig,OUTPUT);//The Trig pin connected to the ultrasound is set to output mode
     pinMode(Echo,INPUT);//The Echo pin connected to the ultrasound is set to input mode
@@ -99,8 +105,8 @@ int SR04(int Trig,int Echo)
     digitalWrite(Trig,LOW);     //Trig is set to low
 
     float cm = pulseIn(Echo,HIGH)/58; //Convert the ranging time to CM
-    Serial.print("\nD");    //Character Distance displayed in serial port monitor window:
-    Serial.print(cm);   
+    Serial.print("D");    //Character Distance displayed in serial port monitor window:
+    Serial.println(cm);   
     return cm;      //Returns cm value ranging data
 }
 /*
@@ -111,8 +117,8 @@ int SR04(int Trig,int Echo)
 */
 void control_func()
 {
-    Serial.print("\nT");    //Character Distance displayed in serial port monitor window:
-    Serial.print(Speed1);
+    Serial.print("T");    //Character Distance displayed in serial port monitor window:
+    Serial.println(Speed1);
     if(Serial.available() > 0)      //Determine if the received data is greater than 0
     {   
         serialData = Serial.read(); //Receiving function
@@ -122,8 +128,9 @@ void control_func()
         else if('L' == serialData )  cmd = 'L';     //If the serial port receives data as the character L, save F to CMD
         else if('R' == serialData )  cmd = 'R';     //If the serial port receives data as the character Y, save F to CMD
         else if('S' == serialData )  cmd = 'S';     //If the serial port receives data as character S, save F to CMD
-        else if('C' == serialData )  cmd = 'C';
-        else if('Q' == serialData )  cmd = 'Q';
+        else if('Z' == serialData )  cmd = 'Z';
+        else if('E' == serialData )  cmd = 'E';
+        else if('M' == serialData )  cmd = 'M';
         else if( serialData == 'Y' && Speed1 < 245)//If you receive a string plus, the speed increases 
         {
             Speed1 += 10;   //We're going to increase the velocity by 10 at a time
@@ -149,9 +156,14 @@ void control_func()
     
     if('F' == cmd)   //If Bluetooth receives the string F, the dolly moves forward and enables obstacle avoidance
     {      
-       AvoidingObstacles();//
+       if(AVOID_OBST==true){
+          AvoidingObstacles();//
+       }else{
+          Motor(Forward,Speed1,Speed2,Speed3,Speed4);
+        
+       }
     }
-    else if('G' == cmd)     //Bluetooth receives string B, car backs up
+    else if('G' == cmd)     //Bluetooth receives string G, car backs up
     {   
         Motor(Back,Speed1,Speed2,Speed3,Speed4);
     }
@@ -159,7 +171,7 @@ void control_func()
     {              
         Motor(Left,Speed1,Speed2,Speed3,Speed4); 
     }
-    else if('R' == cmd)     //Bluetooth received the string Y
+    else if('R' == cmd)     //Bluetooth received the string R
     {
         Motor(Right,Speed1,Speed2,Speed3,Speed4);      //right translation   
     }
@@ -167,13 +179,21 @@ void control_func()
     {
         Motor(Stop,0,0,0,0);
     }
-    else if('C' == cmd)     //Bluetooth received the string C
+    else if('Z' == cmd)     //Bluetooth received the string Z
     {
         Motor(L_turn,Speed1,Speed2,Speed3,Speed4);      //turn left   
     }
-    else if('Q' == cmd)     //Bluetooth received the string D
+    else if('E' == cmd)     //Bluetooth received the string E
     {
         Motor(R_turn,Speed1,Speed2,Speed3,Speed4);      //turn right   
+    }
+    else if('M' == cmd)     //Bluetooth received the string M
+    {
+      AVOID_OBST = !AVOID_OBST;   
+      digitalWrite(LED_BUILTIN, digitalRead(LED_BUILTIN) ^ 1);
+      //Serial.println(AVOID_OBST);
+      cmd = 'S';
+
     }
 }
 
