@@ -1,3 +1,10 @@
+
+/*
+  Mecanum wheel car ino v2.3.6
+  Date: 2023.6.7
+  Author: Ajay Huajian
+  2023 Copyright(c) ZHIYI Technology Inc. All right reserved
+*/
 //Configure THE PWM control pin
 const int PWM2A = 11;      //M1 motor
 const int PWM2B = 3;       //M2 motor
@@ -57,7 +64,14 @@ void loop()
 //    Motor(mytest,Speed1,Speed1,Speed1,Speed1);//test
 }
 
-
+/* Function name: Motor();
+* Function: Change the movement direction and speed of the car through the entrance parameters
+* Entry parameter 1: Dri car movement direction
+* Entry parameters 2~3: Speed1~Speed4 motor speed, value range 0~255
+* Dri value description (forward :216; Back: 39; Left translation: 116; Right translation: 139; Stop: 0;
+* Right rotation: 198; Left rotation: 57)
+* Return value: None
+ */
 void Motor(int Dir,int Speed1,int Speed2,int Speed3,int Speed4)
 {
     analogWrite(PWM2A,Speed1); //Motor PWM speed regulation
@@ -70,7 +84,12 @@ void Motor(int Dir,int Speed1,int Speed2,int Speed3,int Speed4)
     digitalWrite(DIR_LATCH,HIGH);//DIR_LATCH sets the high level and outputs the direction of motion
 }
 
-
+/*
+Function name: SR04()
+Function: Obtain ultrasonic ranging data
+Entry parameters: Trig, Echo
+Function return value: cm
+*/
 int SR04(int Trig,int Echo)
 {
     digitalWrite(Trig,LOW);     //Trig is set to low level
@@ -80,14 +99,20 @@ int SR04(int Trig,int Echo)
     digitalWrite(Trig,LOW);     //Trig is set to low
 
     float cm = pulseIn(Echo,HIGH)/58; //Convert the ranging time to CM
-    Serial.print("Distance:");    //Character Distance displayed in serial port monitor window:
-    Serial.print(cm);
-    Serial.println("cm");
+    Serial.print("\nD");    //Character Distance displayed in serial port monitor window:
+    Serial.print(cm);   
     return cm;      //Returns cm value ranging data
 }
-
+/*
+* Function name: control_func()
+* Function: Receive Bluetooth data, control the car movement direction
+* Entry parameters: None
+* Return value: None
+*/
 void control_func()
 {
+    Serial.print("\nT");    //Character Distance displayed in serial port monitor window:
+    Serial.print(Speed1);
     if(Serial.available() > 0)      //Determine if the received data is greater than 0
     {   
         serialData = Serial.read(); //Receiving function
@@ -99,19 +124,25 @@ void control_func()
         else if('S' == serialData )  cmd = 'S';     //If the serial port receives data as character S, save F to CMD
         else if('C' == serialData )  cmd = 'C';
         else if('Q' == serialData )  cmd = 'Q';
-        else if( serialData == '+' && Speed1 < 245)//If you receive a string plus, the speed increases 
+        else if( serialData == 'Y' && Speed1 < 245)//If you receive a string plus, the speed increases 
         {
             Speed1 += 10;   //We're going to increase the velocity by 10 at a time
             Speed2 = Speed1;
             Speed3 = Speed1;
             Speed4 = Speed1;
+            //Serial.println("Speed: ");
+            //Serial.println(Speed1);
+
         }
-        else if( serialData == '-' && Speed1 > 30)//When I receive a string -- the speed decreases
+        else if( serialData == 'X' && Speed1 > 30)//When I receive a string -- the speed decreases
         {
             Speed1 -= 10;   //I'm going to subtract 10 at a time
             Speed2 = Speed1;
             Speed3 = Speed1;
-            Speed4 = Speed1;
+            Speed4 = Speed1;    
+            //Serial.println("Speed: ");    
+            //Serial.println(Speed1);
+
         }
          Serial.println(serialData);
     }
