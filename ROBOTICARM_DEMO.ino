@@ -5,6 +5,7 @@ Servo servoY1;  // Servo for Y-axis control from Joystick 1
 Servo servoX2;  // Servo for X-axis control from Joystick 2
 Servo servoY2;  // Servo for Y-axis control from Joystick 2
 
+int Speed = 5;
 int joyX1=1;  // Variable to store the X-axis value from Joystick 1
 int joyY1=1;  // Variable to store the Y-axis value from Joystick 1
 int joyX2=1;  // Variable to store the X-axis value from Joystick 2
@@ -32,12 +33,12 @@ void loop() {
 
 
   if(joyX1&&a){
-    servoX1Position++;
+    servoX1Position=servoX1Position+Speed;
     if(servoX1Position==90){
       joyX1=0;
     }
   }else if(a){
-    servoX1Position--;
+    servoX1Position=servoX1Position-Speed;
     if(servoX1Position==30){
       joyX1=1;
       a=false;
@@ -45,12 +46,12 @@ void loop() {
     }
   }
   if(joyY1&&b){
-    servoY1Position++;
+    servoY1Position=servoY1Position+Speed;
     if(servoY1Position==150){
       joyY1=0;
     }
   }else if(b){
-    servoY1Position--;
+    servoY1Position=servoY1Position-Speed;
     if(servoY1Position==120){
       joyY1=1;
       b=false;
@@ -58,12 +59,12 @@ void loop() {
     }
   }
   if(joyX2&&c){
-    servoX2Position++;
+    servoX2Position=servoX2Position+Speed;
     if(servoX2Position==180){
       joyX2=0;
     }
   }else if(c){
-    servoX2Position--;
+    servoX2Position=servoX2Position-Speed;
     if(servoX2Position==10){
       joyX2=1;
       c=false;
@@ -71,12 +72,12 @@ void loop() {
     }
   }
   if(joyY2&&d){
-    servoY2Position++;
+    servoY2Position=servoY2Position+Speed;
     if(servoY2Position==180){
       joyY2=0;
     }
   }else if(d){
-    servoY2Position--;
+    servoY2Position=servoY2Position-Speed;
     if(servoY2Position==90){
       joyY2=1;
       d=false;
