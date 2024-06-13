@@ -1,3 +1,10 @@
+
+/*
+  Mecanum wheel car ino v2.3.6
+  Date: 2023.6.7
+  Author: Ajay Huajian
+  2023 Copyright(c) ZHIYI Technology Inc. All right reserved
+*/
 #define CUSTOM_SETTINGS
 #define INCLUDE_GAMEPAD_MODULE
 #include <Dabble.h>
@@ -158,7 +165,7 @@ void control_func()
         
        }
     }
-    else if('G' == cmd)     //Bluetooth receives string G, car backs up
+    else if('B' == cmd)     //Bluetooth receives string G, car backs up
     {   
         Motor(Back,Speed1,Speed2,Speed3,Speed4);
     }
