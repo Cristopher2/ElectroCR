@@ -1,10 +1,3 @@
-
-/*
-  Mecanum wheel car ino v2.3.6
-  Date: 2023.6.7
-  Author: Ajay Huajian
-  2023 Copyright(c) ZHIYI Technology Inc. All right reserved
-*/
 #define CUSTOM_SETTINGS
 #define INCLUDE_GAMEPAD_MODULE
 #include <Dabble.h>
@@ -45,12 +38,11 @@ int Speed4 = 180;
 int distance = 0;           //Variables for storing ultrasonic sensor measurements
 char serialData;            //put the data received by the serial port in serialData
 char cmd;                   //Store bluetooth receive commands
-
+char Previous = 'S';
 void setup() 
 {
     Serial.begin(250000);      // make sure your Serial Monitor is also set at this baud rate.
     Dabble.begin(9600,9,10);      //Enter baudrate of your bluetooth.Connect bluetooth on Bluetooth port present on evive.
-
     Serial.flush();
 
     //Configure as output mode
@@ -70,9 +62,14 @@ void setup()
 
 void loop()
 {
-    distance = SR04(Trig,Echo);       //Acquisition of ultrasonic distance
+    //Serial.println("Speed: ");    
+    //Serial.println(Speed1);
+    if(AVOID_OBST==true){
+      distance = SR04(Trig,Echo);       //Acquisition of ultrasonic distance
+      Serial.print("D");    //Character Distance displayed in serial port monitor window:
+      Serial.println(distance);   
+    }
     control_func(); //Call the Bluetooth car control function
-//    Motor(mytest,Speed1,Speed1,Speed1,Speed1);//test
 }
 
 /* Function name: Motor();
@@ -110,8 +107,6 @@ int SR04(int Trig,int Echo)
     digitalWrite(Trig,LOW);     //Trig is set to low
 
     float cm = pulseIn(Echo,HIGH)/58; //Convert the ranging time to CM
-    //Serial.print("D");    //Character Distance displayed in serial port monitor window:
-    //Serial.println(cm);   
     return cm;      //Returns cm value ranging data
 }
 /*
@@ -122,39 +117,35 @@ int SR04(int Trig,int Echo)
 */
 void control_func()
 {
-   // Serial.print("T");    //Character Distance displayed in serial port monitor window:
-    //Serial.println(Speed1);
     Dabble.processInput();             //this function is used to refresh data obtained from smartphone.Hence calling this function is mandatory in order to get data properly from your mobile.
-
       if(GamePad.isLeftPressed()&&GamePad.isUpPressed())  cmd = 'Z';
       else if(GamePad.isDownPressed()&&GamePad.isRightPressed() )  cmd = 'E';
       else  if (GamePad.isUpPressed())  cmd = 'F';     //If the data received by the serial port is character F, save F to CMD
       else if (GamePad.isDownPressed())  cmd = 'B';     //If the data received by the serial port is character B, save F to CMD
       else if(GamePad.isLeftPressed())  cmd = 'L';     //If the serial port receives data as the character L, save F to CMD
       else if (GamePad.isRightPressed())  cmd = 'R';     //If the serial port receives data as the character Y, save F to CMD
-      else if(GamePad.isSelectPressed())  cmd = 'M';
+      else if(GamePad.isSelectPressed())  cmd = 'M';     //If the data received by the serial port is character F, save F to CMD
       else if( GamePad.isCirclePressed() && Speed1 < 245)//If you receive a string plus, the speed increases 
       {
           Speed1 += 10;   //We're going to increase the velocity by 10 at a time
           Speed2 = Speed1;
           Speed3 = Speed1;
           Speed4 = Speed1;
-          //Serial.println("Speed: ");
-          //Serial.println(Speed1);
+
 
       }
-      else if(GamePad.isSquarePressed() && Speed1 > 30)//When I receive a string -- the speed decreases
+      else if(GamePad.isSquarePressed() && Speed1 > 30 )//When I receive a string -- the speed decreases
       {
           Speed1 -= 10;   //I'm going to subtract 10 at a time
           Speed2 = Speed1;
           Speed3 = Speed1;
           Speed4 = Speed1;    
-          //Serial.println("Speed: ");    
-          //Serial.println(Speed1);
+          Previous='Square';
+
 
       }
       else {cmd = 'S';}     //If the serial port receives data as character S, save F to CMD
-      Serial.println(serialData);
+      //Serial.println(serialData);
   
     if('F' == cmd)   //If Bluetooth receives the string F, the dolly moves forward and enables obstacle avoidance
     {      
@@ -180,6 +171,7 @@ void control_func()
     else if('S' == cmd)      //When the string S is received, the cart stops moving
     {
         Motor(Stop,0,0,0,0);
+        Previous='S';//We define the previous as S to avoid rebounds 
     }
     else if('Z' == cmd)     //Bluetooth received the string Z
     {
@@ -189,14 +181,16 @@ void control_func()
     {
         Motor(R_turn,Speed1,Speed2,Speed3,Speed4);      //turn right   
     }
-    else if('M' == cmd)     //Bluetooth received the string M
+    else if('M' == cmd&&Previous!='M')     //Bluetooth received the string M on this key is important to suppress rebounds, thats why we check that the previous cmd is not M
     {
       AVOID_OBST = !AVOID_OBST;   
+      Previous='M'; //We set the previous cmd as M to avoid rebounds
       digitalWrite(LED_BUILTIN, digitalRead(LED_BUILTIN) ^ 1);
-      //Serial.println(AVOID_OBST);
       cmd = 'S';
 
     }
+    delay(10);//Delay of 100 ms
+
 }
 
 void AvoidingObstacles()
